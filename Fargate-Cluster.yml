@@ -212,8 +212,8 @@ Resources:
       SecurityGroups:
         - !Ref LoadBalancerSecurityGroup
       Subnets:
-        - !Ref PrivateSubnet1
-        - !Ref PrivateSubnet2
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet1
       Type: application
   TargetGroup:
     Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
