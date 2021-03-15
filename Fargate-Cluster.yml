@@ -195,10 +195,8 @@ Resources:
           - LoadBalancerSecurityGroup
       VpcId: !Ref PubPrivateVPC
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
   LoadBalancer:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
@@ -212,8 +210,8 @@ Resources:
       SecurityGroups:
         - !Ref LoadBalancerSecurityGroup
       Subnets:
-        - !Ref PrivateSubnet1
-        - !Ref PrivateSubnet2
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
       Type: application
   TargetGroup:
     Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
@@ -223,15 +221,42 @@ Resources:
         - - !Ref Stage
           - !Ref 'AWS::AccountId'
           - TargetGroup
+      HealthCheckIntervalSeconds: 6
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
       Port: 80
       Protocol: HTTP
+      TargetType: instance
+      UnhealthyThresholdCount: 2
       VpcId: !Ref PubPrivateVPC
+  ListenerRule1:
+    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
+    Properties:
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - /ec2/*
+      ListenerArn: !Ref LoadBalancerListener
+      Priority: 1
   LoadBalancerListener:
     Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    DependsOn:
+      - LoadBalancer
     Properties:
       DefaultActions:
-        - TargetGroupArn: !Ref TargetGroup
-          Type: forward
+        - Type: redirect
+          RedirectConfig:
+            Protocol: '#{protocol}'
+            Port: '#{port}'
+            Host: '#{host}'
+            Path: /ec2/
+            StatusCode: HTTP_301
       LoadBalancerArn: !Ref LoadBalancer
       Port: 80
       Protocol: HTTP
@@ -362,7 +387,7 @@ Resources:
             - '         --resource ECSAutoScalingGroup '
             - '         --region '
             - !Ref 'AWS::Region'
-            - |+
+            - ''
     Metadata:
       'AWS::CloudFormation::Init':
         config:
@@ -380,10 +405,10 @@ Resources:
                     [main]
                   - stack=
                   - !Ref 'AWS::StackName'
-                  - |+
+                  - ''
                   - region=
                   - !Ref 'AWS::Region'
-                  - |+
+                  - ''
             /etc/cfn/hooks.d/cfn-auto-reloader.conf:
               mode: '000700'
               owner: root
@@ -402,7 +427,7 @@ Resources:
                   - '         --resource ECSLaunchConfiguration '
                   - '         --region '
                   - !Ref 'AWS::Region'
-                  - |+
+                  - ''
                   - |
                     runas=root
           services:
