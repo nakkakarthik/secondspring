@@ -146,7 +146,7 @@ Resources:
                 ProjectName: !Ref BuildProject
             RunOrder: 1
 
-        # Deploy the project by executing Fargate-Cluster.yml file in the Source code with Cloudformation.
+        # Deploy the project by executing Ec2.yml file in the Source code with Cloudformation.
         - Name: Deploy
           Actions:
           - Name: Deploy
@@ -170,6 +170,6 @@ Resources:
                   }
                 RoleArn: 
                   Fn::GetAtt: [ CloudformationExecutionRole, Arn ]
-                StackName: !Join ['-', [!Ref Stage , 'FargateECSCluster']]
-                TemplatePath: source-output-artifacts::Fargate-Cluster.yml
+                StackName: !Join ['-', [!Ref Stage , 'EC2ECSCluster']]
+                TemplatePath: source-output-artifacts::ec2.yml
             RunOrder: 1
