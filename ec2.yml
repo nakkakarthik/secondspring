@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  The stack deploying the docker container from build stage to the ECS Ec2 using
-  load balancer and autoscaling infra
+  The stack deploying the docker container from build stage to the ECS Ec2 using load balancer and autoscaling
+  infra
 Mappings:
   AWSRegionToAMI:
     us-east-1:
@@ -17,6 +17,7 @@ Parameters:
     Description: name of ec2 key pair to be used
     Type: String
     Default: ec2-key
+
 Resources:
   PubPrivateVPC:
     Type: 'AWS::EC2::VPC'
@@ -178,7 +179,6 @@ Resources:
       Name: !Join 
         - '-'
         - - !Ref Stage
-          - !Ref 'AWS::AccountId'
           - LoadBalancer
       Scheme: internet-facing
       SecurityGroups:
@@ -213,7 +213,6 @@ Resources:
       ServiceName: !Join 
         - '-'
         - - !Ref Stage
-          - !Ref 'AWS::AccountId'
           - ECSService
       Cluster: !Ref ECSCluster
       TaskDefinition: !Ref TaskDefinition
@@ -223,7 +222,6 @@ Resources:
         - ContainerName: !Join 
             - '-'
             - - !Ref Stage
-              - !Ref 'AWS::AccountId'
               - Container
           ContainerPort: !Ref ContainerPort
           TargetGroupArn: !Ref TargetGroup
@@ -308,7 +306,7 @@ Resources:
             - '         --resource ECSAutoScalingGroup '
             - '         --region '
             - !Ref 'AWS::Region'
-            - ''
+            - |+
     Metadata:
       'AWS::CloudFormation::Init':
         config:
@@ -326,10 +324,10 @@ Resources:
                     [main]
                   - stack=
                   - !Ref 'AWS::StackName'
-                  - ''
+                  - |+
                   - region=
                   - !Ref 'AWS::Region'
-                  - ''
+                  - |+
             /etc/cfn/hooks.d/cfn-auto-reloader.conf:
               mode: '000700'
               owner: root
@@ -348,7 +346,7 @@ Resources:
                   - '         --resource ECSLaunchConfiguration '
                   - '         --region '
                   - !Ref 'AWS::Region'
-                  - ''
+                  - |+
                   - |
                     runas=root
           services:
