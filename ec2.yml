@@ -193,7 +193,6 @@ Resources:
       Name: !Join 
         - '-'
         - - !Ref Stage
-          - !Ref 'AWS::AccountId'
           - TargetGroup
       Port: 80
       Protocol: HTTP
