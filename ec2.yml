@@ -1,12 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  The stack deploying the docker container from build stage to the ECS Ec2 using load balancer and autoscaling
-  infra
+  The stack deploying the docker container from build stage to the ECS Ec2 using
+  load balancer and autoscaling infra
 Mappings:
   AWSRegionToAMI:
     us-east-1:
       AMI: ami-07eb698ce660402d2
-	  
 Parameters:
   Stage:
     Type: String
@@ -18,7 +17,6 @@ Parameters:
     Description: name of ec2 key pair to be used
     Type: String
     Default: ec2-key
-
 Resources:
   PubPrivateVPC:
     Type: 'AWS::EC2::VPC'
@@ -311,7 +309,7 @@ Resources:
             - '         --resource ECSAutoScalingGroup '
             - '         --region '
             - !Ref 'AWS::Region'
-            - |+
+            - ''
     Metadata:
       'AWS::CloudFormation::Init':
         config:
@@ -329,10 +327,10 @@ Resources:
                     [main]
                   - stack=
                   - !Ref 'AWS::StackName'
-                  - |+
+                  - ''
                   - region=
                   - !Ref 'AWS::Region'
-                  - |+
+                  - ''
             /etc/cfn/hooks.d/cfn-auto-reloader.conf:
               mode: '000700'
               owner: root
@@ -351,7 +349,7 @@ Resources:
                   - '         --resource ECSLaunchConfiguration '
                   - '         --region '
                   - !Ref 'AWS::Region'
-                  - |+
+                  - ''
                   - |
                     runas=root
           services:
